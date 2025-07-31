@@ -1,0 +1,46 @@
+package com.sprint.mission.discodeit.service.basic;
+
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.UserService;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+public class BasicUserService implements UserService {
+
+    private final UserRepository userRepository;
+
+    public  BasicUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    public User create(User user) {
+        if (user == null || user.getUserId() == null) {
+            throw new IllegalArgumentException("User 및 이름은 null이 될 수 없습니다.");
+        }
+        return userRepository.create(user);
+    }
+
+    @Override
+    public Optional<User> findById(UUID userId) {
+        return userRepository.findById(userId);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public Optional<User> updateId(UUID userId, User updateUser) {
+        return userRepository.updateId(userId, updateUser);
+    }
+
+    @Override
+    public boolean deleteById(UUID userId) {
+        return userRepository.deleteById(userId);
+    }
+}
