@@ -19,7 +19,7 @@ public class BasicUserService implements UserService {
     @Override
     public User create(User user) {
         if (user == null || user.getUserId() == null) {
-            throw new IllegalArgumentException("User 및 이름은 null이 될 수 없습니다.");
+            throw new IllegalArgumentException("User 및 user ID는 null이 될 수 없습니다.");
         }
         return userRepository.create(user);
     }
