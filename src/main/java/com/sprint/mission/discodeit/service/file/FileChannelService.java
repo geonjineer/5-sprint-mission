@@ -92,6 +92,42 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
+    public Channel update(UUID channelId, String newChannelName, String newDescription) {
+        if (channelId == null) {
+            System.err.println("오류: update 실패. channelId가 null 입니다.");
+            return null;
+        }
+        Path filePath = directory.resolve(channelId + ".ser");
+        if (!Files.exists(filePath)) {
+            return null;
+        }
+
+        // 기존 채널 정보 읽기
+        Channel channel = null;
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath.toFile()))) {
+            channel = (Channel) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("오류: Channel 읽기 실패: " + filePath + " / " + e.getMessage());
+            return null;
+        }
+
+        // Channel 내부 update 메서드로 값 변경(직접 setXXX 사용하지 않음)
+        channel.updateChannel(newChannelName, newDescription);
+
+        // 저장
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toFile()))) {
+            oos.writeObject(channel);
+        } catch (IOException e) {
+            System.err.println("오류 : Channel 업데이트 실패: " + filePath + " / " + e.getMessage());
+            return null;
+        }
+        System.out.println("updatedChannel : " + channel);
+        return channel;
+    }
+
+
+    /*
+    @Override
     public Optional<Channel> update(UUID channelId, Channel updatedChannel) {
         if (channelId == null ||  updatedChannel == null) {
             System.err.println("오류: update 실패. channelId 또는 updatedChannel이 null 입니다.");
@@ -110,6 +146,7 @@ public class FileChannelService implements ChannelService {
         System.out.println("updatedChannel : " + updatedChannel);
         return  Optional.of(updatedChannel);
     }
+     */
 
     @Override
     public boolean delete(UUID channelId) {

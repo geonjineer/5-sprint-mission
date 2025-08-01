@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.time.Instant;
 import java.util.UUID; // UUID를 사용하기 위한 import
 import java.io.Serializable; // 직렬화 기능 sprint-2
 
@@ -24,7 +25,8 @@ public class Message implements Serializable {
 
     public Message(String content, UUID userId, UUID channelId) {
         this.messageId = UUID.randomUUID(); // 새로운 UUID 생성하여 id 초기화
-        this.createdAt = System.currentTimeMillis(); // 현재 시간을 유닉스 타임스탬프로 createdAt 초기화
+        //this.createdAt = System.currentTimeMillis(); // 현재 시간을 유닉스 타임스탬프로 createdAt 초기화
+        this.createdAt = Instant.now().getEpochSecond(); // 멘토님이 알려주신 초기화 방법
         this.updatedAt = createdAt; // 초기 updatedAt은 createdAt과 동일하게 설정
         this.content = content;
         this.userId = userId;
@@ -61,25 +63,27 @@ public class Message implements Serializable {
     // 수정된 필드에 따라 updatedAt를 현재 시간으로 업데이트한다.
     // @param content 새로운 메세지 내용 (null이 아니면 업데이트)
     //
-    public void updateMessage(String content) {
-        if(content != null && !content.equals(this.content)) {
-            this.content = content;
-            this.updatedAt = System.currentTimeMillis(); // 내용이 변경되었으므로 updatedAt 업데이트
+    public void updateMessage(String newContent, Long newUpdatedAt) {
+        if (newContent != null) {
+            this.content = newContent;
+        }
+        if (newUpdatedAt != null) {
+            this.updatedAt = newUpdatedAt;
         }
     }
 
     //toSting, Override
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Message{");
-        sb.append("messageId=").append(messageId);
-        sb.append(", createdAt=").append(createdAt);
-        sb.append(", updatedAt=").append(updatedAt);
-        sb.append(", content='").append(content).append('\'');
-        sb.append(", userId=").append(userId);
-        sb.append(", channelId=").append(channelId);
-        sb.append('}');
-        return sb.toString();
+        return "Message{" +
+                "messageId=" + messageId +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", content='" + content + '\'' +
+                ", userId=" + userId +
+                ", channelId=" + channelId +
+                '}';
     }
 }
 

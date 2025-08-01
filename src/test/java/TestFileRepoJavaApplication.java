@@ -19,10 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-
- //애플리케이션의 메인 클래스.
- //각 도메인 서비스의 CRUD 기능을 테스트하고, 심화 요구사항인 의존성 주입 및 검증 로직을 시연한다.
-
 public class TestFileRepoJavaApplication {
 
     // 폴더 내 모든 .ser 파일 삭제
@@ -40,7 +36,7 @@ public class TestFileRepoJavaApplication {
     }
 
     public static void main(String[] args) {
-        //file repository
+        // file repository
         FileUserRepository userRepo = new FileUserRepository();
         FileChannelRepository channelRepo = new FileChannelRepository();
         FileMessageRepository messageRepo = new FileMessageRepository();
@@ -76,11 +72,8 @@ public class TestFileRepoJavaApplication {
         allUsers.forEach(System.out::println);
 
         // 4. 사용자 수정 (Update)
-        // User 객체 자체의 update 메서드를 호출하여 필드를 변경합니다.
-        user1.updateUser("Alicia", "alicia_new@example.com");
-        // 서비스의 update 메서드를 호출하여 변경된 내용을 반영하고, 저장소에 업데이트합니다.
-        Optional<User> updatedUser1 = userService.updateId(user1.getUserId(), user1);
-        updatedUser1.ifPresent(user -> System.out.println("\n[수정] Alice -> Alicia로 수정 완료: " + user));
+        User updatedUser1 = userService.updateUser(user1.getUserId(), "Alicia", "alicia_new@example.com", null);
+        System.out.println("\n[수정] Alice -> Alicia로 수정 완료: " + updatedUser1);
 
         // 5. 수정된 데이터 조회 확인
         Optional<User> reFoundUser1 = userService.findById(user1.getUserId());
@@ -119,9 +112,8 @@ public class TestFileRepoJavaApplication {
         allChannels.forEach(System.out::println);
 
         // 4. 채널 수정 (Update)
-        channel1.updateChannel("General Chat", "자유로운 대화를 위한 채널");
-        Optional<Channel> updatedChannel1 = channelService.update(channel1.getChannelId(), channel1);
-        updatedChannel1.ifPresent(channel -> System.out.println("\n[수정] General -> General Chat으로 수정 완료: " + channel));
+        Channel updatedChannel1 = channelService.update(channel1.getChannelId(), "General Chat", "자유로운 대화를 위한 채널");
+        System.out.println("\n[수정] General -> General Chat으로 수정 완료: " + updatedChannel1);
 
         // 5. 수정된 데이터 조회 확인
         Optional<Channel> reFoundChannel1 = channelService.findById(channel1.getChannelId());
@@ -174,11 +166,8 @@ public class TestFileRepoJavaApplication {
         allMessages.forEach(System.out::println);
 
         // 4. 메시지 수정 (Update)
-        // Message 객체 자체의 update 메서드를 호출하여 필드를 변경합니다.
-        msg1.updateMessage("Hello, world! (updated)");
-        // 서비스의 update 메서드를 호출하여 변경된 내용을 반영하고, 저장소에 업데이트합니다.
-        Optional<Message> updatedMsg1 = messageService.update(msg1.getMessageId(), msg1);
-        updatedMsg1.ifPresent(message -> System.out.println("\n[수정] 메시지 수정 완료: " + message));
+        Message updatedMsg1 = messageService.update(msg1.getMessageId(), "Hello, world! (updated)", System.currentTimeMillis() / 1000);
+        System.out.println("\n[수정] 메시지 수정 완료: " + updatedMsg1);
 
         // 5. 수정된 데이터 조회 확인
         Optional<Message> reFoundMsg1 = messageService.findById(msg1.getMessageId());

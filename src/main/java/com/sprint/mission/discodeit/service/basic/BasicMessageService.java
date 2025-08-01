@@ -35,9 +35,33 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
+    public Message update(UUID messageId, String newContent, Long newUpdatedAt) {
+        if (messageId == null) {
+            return null;
+        }
+        Optional<Message> optionalMessage = messageRepository.findById(messageId);
+        if (optionalMessage.isEmpty()) {
+            return null;
+        }
+        Message message = optionalMessage.get();
+
+        // 한 번에 모든 필드 갱신!
+        message.updateMessage(newContent, newUpdatedAt);
+
+        // 변경사항 저장
+        messageRepository.create(message); // 또는 update, 저장 방식에 맞게
+        return message;
+    }
+
+
+
+    /*
+    @Override
     public Optional<Message> update(UUID messageId, Message updatedMessage) {
         return messageRepository.update(messageId, updatedMessage);
     }
+
+     */
 
     @Override
     public boolean delete(UUID messageId) {

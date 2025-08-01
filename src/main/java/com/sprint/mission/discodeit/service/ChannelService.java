@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel; // Channel 도메인 모델 import
+import com.sprint.mission.discodeit.entity.User;
+
 import java.util.List; // List 인터페이스 import
 import java.util.Optional; // Optional 클래스 import
 import java.util.UUID; // UUID 클래스 import
@@ -26,7 +28,10 @@ public interface ChannelService {
     //@param channelId 업데이트할 Channel의 UUID
     //@param updatedChannel 업데이트할 내용을 담은 Channel 객체 (id, createdAt 제외)
     //@return 업데이트된 Channel 객체 (존재하지 않으면 Optional.empty()
-    Optional<Channel> update(UUID channelId, Channel updatedChannel);
+    //Optional<Channel> update(UUID channelId, Channel updatedChannel);
+
+    //멘토님이 알려주신 업테이트 방법
+    Channel update(UUID chanelId, String newChannelName, String newDescription);
 
     //주어진 ID에 해당하는 Channel을 삭제.
     //@param channelId 삭제할 Channel의 UUID

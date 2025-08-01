@@ -93,6 +93,41 @@ public class FileUserService implements UserService {
     }
 
     @Override
+    public User updateUser(UUID userId, String newUsername, String newEmail, String newPassword) {
+        if (userId == null) {
+            System.err.println("오류: update 실패. userId가 null 입니다.");
+            return null;
+        }
+        Path filePath = this.directory.resolve(userId + ".ser");
+        if (!Files.exists(filePath)) {
+            return null;
+        }
+
+        // 기존 유저 정보 읽기
+        User user = null;
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath.toFile()))) {
+            user = (User) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("오류: User 읽기 실패: " + filePath + " / " + e.getMessage());
+            return null;
+        }
+
+        // User 내부 update 메서드 사용 (setXXX 금지!)
+        user.updateUser(newUsername, newEmail, newPassword);
+
+        // 저장
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toFile()))) {
+            oos.writeObject(user);
+        } catch (IOException e) {
+            System.err.println("오류 : User 업데이트 실패: " + filePath + " / " + e.getMessage());
+            return null;
+        }
+        return user;
+    }
+
+
+    /*
+    @Override
     public Optional<User> updateId(UUID userId, User updateUser) {
         if (userId == null || updateUser == null) {
             System.err.println("오류: update 실패. userId 또는 updatedUser가 null 입니다.");
@@ -110,6 +145,7 @@ public class FileUserService implements UserService {
         System.out.println("updateUser : " + updateUser);
         return Optional.of(updateUser);
     }
+     */
 
     @Override
     public boolean deleteById(UUID userId) {

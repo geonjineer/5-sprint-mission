@@ -58,12 +58,31 @@ public class JCFUserService implements UserService {
         return new ArrayList<>(data.values()); // Map의 모든 값(User 객체)들을 ArrayList로 변환하여 반환
     }
 
+    @Override
+    public User updateUser(UUID userId, String newUsername, String newEmail, String newPassword) {
+        if (userId == null) {
+            System.err.println("오류: User 업데이트에 실패했습니다. User ID가 null입니다.");
+            return null;
+        }
+        User existingUser = data.get(userId);
+        if (existingUser == null) {
+            System.err.println("오류: User 업데이트에 실패했습니다. 해당 ID의 사용자가 없습니다.");
+            return null;
+        }
+        // 엔티티의 update 메서드만 사용(setXXX 직접 호출 금지)
+        existingUser.updateUser(newUsername, newEmail, newPassword);
+
+        System.out.println("사용자 업데이트: " + existingUser);
+        return existingUser;
+    }
+
+
     //주어진 ID에 해당하는 User를 Map에서 업데이트합니다.
     //User 객체의 update 메서드를 호출하여 필드를 수정하고, updatedAt을 업데이트합니다.
     //@param userId 업데이트할 User의 UUID
     //@param updatedUser 업데이트할 내용을 담은 User 객체 (userId, createdAt 제외)
     //@return 업데이트된 User 객체 (존재하지 않으면 Optional.empty())
-    @Override // 인터페이스 메서드를 오버라이드함을 명시
+    /* @Override // 인터페이스 메서드를 오버라이드함을 명시
     public Optional<User> updateId(UUID userId, User updatedUser) {
         if (userId == null || updatedUser == null) {
             System.err.println("오류: User 업데이트에 실패했습니다. User ID 또는 updateUser가 null입니다.");
@@ -78,6 +97,8 @@ public class JCFUserService implements UserService {
                 });
 
     }
+
+     */
 
    //주어진 ID에 해당하는 User를 Map에서 삭제합니다.
    //@param id 삭제할 User의 UUID

@@ -57,13 +57,31 @@ public class JCFChannelService implements ChannelService {
         return new ArrayList<>(data.values()); // Map의 모든 값(Channel 객체)들을 ArrayList로 변환하여 반환
     }
 
+    @Override
+    public Channel update(UUID channelId, String newChannelName, String newDescription) {
+        if (channelId == null) {
+            System.err.println("에러: Channel 업데이트에 실패했습니다. Channel ID가 null입니다.");
+            return null;
+        }
+        Channel existingChannel = data.get(channelId);
+        if (existingChannel == null) {
+            System.err.println("에러: Channel 업데이트에 실패했습니다. 해당 ID의 채널이 없습니다.");
+            return null;
+        }
+        // 엔티티의 updateChannel 메서드만 사용(setXXX 직접 호출 금지)
+        existingChannel.updateChannel(newChannelName, newDescription);
+
+        System.out.println("Channel 업데이트: " + existingChannel);
+        return existingChannel;
+    }
+
+
     //주어진 ID에 해당하는 Channel을 Map에서 업데이트합니다.
     //Channel 객체의 update 메서드를 호출하여 필드를 수정하고, updatedAt을 업데이트합니다.
     //@param id 업데이트할 Channel의 UUID
     //@param updatedChannel 업데이트할 내용을 담은 Channel 객체 (id, createdAt 제외)
     //@return 업데이트된 Channel 객체 (존재하지 않으면 Optional.empty())
-
-    @Override
+    /* @Override
     public Optional<Channel> update(UUID channelId, Channel updatedChannel) {
         if (channelId == null || updatedChannel == null) {
             System.err.println("에러: Channel 업데이트에 실패했습니다. Channel ID 또는 updatedChannel이 null입니다.");
@@ -77,6 +95,8 @@ public class JCFChannelService implements ChannelService {
                     return existingChannel;
                 });
     }
+
+     */
 
     //주어진 ID에 해당하는 Channel을 Map에서 삭제합니다.
     //@param channelId 삭제할 Channel의 UUID

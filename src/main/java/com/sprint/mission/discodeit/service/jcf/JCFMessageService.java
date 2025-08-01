@@ -81,13 +81,31 @@ public class JCFMessageService implements MessageService {
         return new ArrayList<>(data.values()); // Map의 모든 값(Message 객체)들을 ArrayList로 변환하여 반환
     }
 
+    @Override
+    public Message update(UUID messageId, String newContent, Long newUpdatedAt) {
+        if (messageId == null) {
+            System.err.println("오류: Message 업데이트에 실패했습니다. Message ID가 null입니다.");
+            return null;
+        }
+        Message existingMessage = data.get(messageId);
+        if (existingMessage == null) {
+            System.err.println("오류: Message 업데이트에 실패했습니다. 해당 ID의 메시지가 없습니다.");
+            return null;
+        }
+        // 오직 엔티티의 updateMessage 메서드만 사용!
+        existingMessage.updateMessage(newContent, newUpdatedAt);
+
+        System.out.println("Message 업데이트: " + existingMessage);
+        return existingMessage;
+    }
+
 
     //주어진 ID에 해당하는 Message를 Map에서 업데이트합니다.
     //Message 객체의 update 메서드를 호출하여 필드를 수정하고, updatedAt을 업데이트합니다.
     //@param id 업데이트할 Message의 UUID
     //@param updatedMessage 업데이트할 내용을 담은 Message 객체 (id, createdAt, userId, channelId 제외)
     //@return 업데이트된 Message 객체 (존재하지 않으면 Optional.empty())
-    @Override
+    /* @Override
     public Optional<Message> update(UUID messageId, Message updatedMessage) {
         if (messageId == null || updatedMessage == null) {
             System.err.println("오류: Message 업데이트에 실패했습니다. Message ID 또는 updatedMessage가 null입니다.");
@@ -101,6 +119,8 @@ public class JCFMessageService implements MessageService {
                     return existingMessage;
                 });
     }
+
+     */
 
 
     //주어진 ID에 해당하는 Message를 Map에서 삭제합니다.

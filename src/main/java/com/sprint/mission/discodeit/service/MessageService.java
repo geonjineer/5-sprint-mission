@@ -27,7 +27,10 @@ public interface MessageService {
     //@param messageId 업데이트할 Message의 UUID
     //@param updatedMessage 업데이트할 내용을 담은 Message 객체 (messageId, createdAt, userId, channelId 제외)
     //@return 업데이트된 Message 객체 (존재하지 않으면 Optional.empty())
-    Optional<Message> update(UUID messageId, Message updatedMessage);
+    //Optional<Message> update(UUID messageId, Message updatedMessage);
+
+    //멘토님이 알려주신 업테이트 방법
+    Message update(UUID messageId, String newContent, Long newUpdatedAt);
 
     //주어진 ID에 해당하는 Message를 삭제.
     //@param messageId 삭제할 Message의 UUID

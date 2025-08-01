@@ -9,6 +9,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.rmi.ServerError;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -117,6 +118,50 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
+    public Message update(UUID messageId, String newContent, Long newUpdatedAt) {
+        if (messageId == null) {
+            System.err.println("오류 : messageId가 null 입니다.");
+            return null;
+        }
+        Path filePath = this.directory.resolve(messageId + ".ser");
+        if (!Files.exists(filePath)) {
+            return null;
+        }
+
+        // 기존 메시지 읽어오기
+        Message message = null;
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath.toString()))) {
+            message = (Message) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("오류: Message 읽기 실패: " + filePath + " / " + e.getMessage());
+            return null;
+        }
+
+        // newUpdatedAt(String)을 Long으로 변환
+        Long updatedAt = null;
+        if (newUpdatedAt != null) {
+            try {
+                updatedAt = newUpdatedAt;
+            } catch (NumberFormatException e) {
+                updatedAt = System.currentTimeMillis() / 1000; // 초 단위로 변환
+            }
+        }
+
+        // 한 번에 변경
+        message.updateMessage(newContent, updatedAt);
+
+        // 수정된 메시지 저장
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toString()))) {
+            oos.writeObject(message);
+        } catch (IOException e) {
+            System.err.println("오류 : Message 업데이트 실패: " + filePath + " / " + e.getMessage());
+            return null;
+        }
+        return message;
+    }
+
+
+    /* @Override
     public Optional<Message> update(UUID messageId, Message updatedMessage) {
         if (messageId == null || updatedMessage == null) {
             System.err.println("오류: update 실패. messageId 또는 updatedMessage가 null 입니다.");
@@ -135,6 +180,8 @@ public class FileMessageService implements MessageService {
         System.out.println("updatedMessage : " + updatedMessage);
         return Optional.of(updatedMessage);
     }
+
+     */
 
     @Override
     public boolean delete(UUID messageId) {

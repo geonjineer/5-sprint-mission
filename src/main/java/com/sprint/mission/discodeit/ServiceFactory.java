@@ -1,4 +1,4 @@
-package com.sprint.mission;
+package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.service.ChannelService; // ChannelService 인터페이스 import
 import com.sprint.mission.discodeit.service.MessageService; // MessageService 인터페이스 import
@@ -7,10 +7,6 @@ import com.sprint.mission.discodeit.service.UserService; // UserService 인터�
 import com.sprint.mission.discodeit.service.file.FileChannelService; // FileChannelService 구현체 import
 import com.sprint.mission.discodeit.service.file.FileMessageService; // FileMessageService 구현체 import
 import com.sprint.mission.discodeit.service.file.FileUserService; // FileUserService 구현체 import
-
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService; // JCFChannelService 구현체 import
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService; // JCFMessageService 구현체 import
-import com.sprint.mission.discodeit.service.jcf.JCFUserService; // JCFUserService 구현체 import
 
 
 //서비스 구현체 인스턴스를 제공하는 팩토리 클래스입니다.

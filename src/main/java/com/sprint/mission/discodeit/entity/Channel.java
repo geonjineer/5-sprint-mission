@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.time.Instant;
 import java.util.UUID; // UUID를 사용하기 위한 import
 import java.io.Serializable; // 직렬화 기능 sprint-2
 
@@ -13,6 +14,12 @@ public class Channel implements Serializable {
     private String channelName; // 채널 이름
     private String description; // 채널 설명
 
+    //멘토님 추가 사항 필수 필드 추가
+    public enum ChannelType {
+        PUBLIC,
+        PRIVATE,
+    }
+
     // Channel 객체의 생성자입니다.
     // id와 createdAt은 생성 시점에 초기화되며, 다른 필드들은 파라미터를 통해 초기화됩니다.
     // @param channelName 채널 이름
@@ -21,7 +28,8 @@ public class Channel implements Serializable {
 
     public Channel(String channelName, String description) {
         this.channelId = UUID.randomUUID(); // 새로운 UUID 생성하여 id 초기화
-        this.createdAt = System.currentTimeMillis(); // 현재 시간을 유닉스 타임스탬프로 createdAt 초기화
+        //this.createdAt = System.currentTimeMillis(); // 현재 시간을 유닉스 타임스탬프로 createdAt 초기화
+        this.createdAt = Instant.now().getEpochSecond(); // 멘토님 참고 사항
         this.updatedAt = createdAt; // 초기 updatedAt은 createdAt과 동일하게 설정
         this.channelName = channelName;
         this.description = description;
@@ -52,7 +60,7 @@ public class Channel implements Serializable {
     // 수정된 필드에 따라 updatedAt를 현재 시간으로 업데이트한다.
     // @param channelName 새로운 채널 이름 (null이 아니면 업데이트)
     // @param description 새로운 채널 설명 (null이 아니면 업데이트)
-    public void updateChannel(String channelName, String description) {
+    /* public void updateChannel(String channelName, String description) {
         boolean changed = false; // 변경 여부를 추적하는 플래그
 
         if(channelName != null && !channelName.equals(this.channelName)) {
@@ -70,17 +78,35 @@ public class Channel implements Serializable {
             this.updatedAt = System.currentTimeMillis();
         }
     }
+     */
+    //멘토님이 알려주신 업데이트 방법
+    public void updateChannel(String newChannelName, String newDescription) {
+        boolean anyValueUpdated = false;
+
+        if (newChannelName != null && !newChannelName.equals(this.channelName)) {
+            this.channelName = newChannelName;
+
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
+    }
 
     //toSting, Override
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Channel{");
-        sb.append("channelId=").append(channelId);
-        sb.append(", createdAt=").append(createdAt);
-        sb.append(", updatedAt=").append(updatedAt);
-        sb.append(", channelName='").append(channelName).append('\'');
-        sb.append(", description='").append(description).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return "Channel{" +
+                "channelId=" + channelId +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", channelName='" + channelName + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }
