@@ -6,36 +6,35 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import java.util.*;
 
 public class JCFChannelRepository implements ChannelRepository {
+    private final Map<UUID, Channel> data;
 
-    private final Map<UUID, Channel> channelHashMap = new HashMap<>();
+    public JCFChannelRepository() {
+        this.data = new HashMap<>();
+    }
 
     @Override
-    public Channel create(Channel channel) {
-        channelHashMap.put(channel.getChannelId(), channel);
+    public Channel save(Channel channel) {
+        this.data.put(channel.getId(), channel);
         return channel;
     }
 
     @Override
-    public Optional<Channel> findById(UUID channelId) {
-        return Optional.ofNullable(channelHashMap.get(channelId));
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
     public List<Channel> findAll() {
-        return new ArrayList<>(channelHashMap.values());
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public Optional<Channel> update(UUID channelId, Channel updatedChannel) {
-        if (!channelHashMap.containsKey(channelId)) {
-            return Optional.empty();
-        }
-        channelHashMap.put(channelId, updatedChannel);
-        return Optional.of(updatedChannel);
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
     @Override
-    public boolean delete(UUID channelId) {
-        return channelHashMap.remove(channelId) != null;
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 }
