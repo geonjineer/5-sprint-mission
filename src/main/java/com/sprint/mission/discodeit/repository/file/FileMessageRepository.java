@@ -4,91 +4,97 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.io.*;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public class FileMessageRepository implements MessageRepository {
-
-    private final Path directory = Paths.get(System.getProperty("user.dir"), "message_data");
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
     public FileMessageRepository() {
-        if (!Files.exists(directory)) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
             try {
-                Files.createDirectories(directory);
-            } catch (IOException e){
-                throw new RuntimeException("message_data 폴더 생성 실패",e);
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
-    @Override
-    public Message create(Message message) {
-        Path filepath = directory.resolve(message.getChannelId() + ".ser");
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filepath.toString()))) {
-            oos.writeObject(message);
-            return message;
-        } catch (IOException e) {
-            throw new RuntimeException("Message 파일 생성 실패", e);
-        }
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
-    public Optional<Message> findById(UUID messageId) {
-        Path filePath = directory.resolve(messageId + ".ser");
-        if (!Files.exists(filePath)) {
-            return Optional.empty();
-        } try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath.toString()))) {
-            Message message = (Message) ois.readObject();
-            return  Optional.of(message);
-        } catch (IOException | ClassNotFoundException e) {
-            return Optional.empty();
+    public Message save(Message message) {
+        Path path = resolvePath(message.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+        return message;
+    }
+
+    @Override
+    public Optional<Message> findById(UUID id) {
+        Message messageNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                messageNullable = (Message) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(messageNullable);
     }
 
     @Override
     public List<Message> findAll() {
-        List<Message> messages = new ArrayList<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory, ".ser")) {
-            for (Path path : stream) {
-                try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toString()))) {
-                    Message message = (Message) ois.readObject();
-                    messages.add(message);
-                } catch (Exception ignored) {
-                }
-            }
-        } catch (IOException e){
-            throw new RuntimeException("user_data 폴더 목록 조회 실패", e);
-        }
-        return messages;
-    }
-
-    @Override
-    public Optional<Message> update(UUID messageId, Message updatedMessage) {
-        Path filePath = directory.resolve(messageId + ".ser");
-        if (!Files.exists(filePath)) {
-            return Optional.empty();
-        } try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toString()))) {
-            oos.writeObject(updatedMessage);
-            return Optional.of(updatedMessage);
-        } catch (IOException e){
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public boolean delete(UUID messageId) {
-        Path filePath = directory.resolve(messageId + ".ser");
         try {
-            return Files.deleteIfExists(filePath);
-        }catch (IOException e){
-            return false;
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (Message) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
+    @Override
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
