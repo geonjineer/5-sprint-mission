@@ -9,7 +9,6 @@ public class Channel implements Serializable {
     private UUID id;
     private Long createdAt;
     private Long updatedAt;
-    //
     private ChannelType type;
     private String name;
     private String description;
